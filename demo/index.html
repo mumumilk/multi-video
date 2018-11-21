@@ -17,7 +17,13 @@
   </head>
   <body>
     <section style="max-width: 800px; height: 500px;">
-        <multi-video ></multi-video>
+        <multi-video id="mv"></multi-video>
     </section>
+  
+    <script>
+      document.getElementById('mv').videos = [
+        {url: 'http://techslides.com/demos/sample-videos/small.mp4', id: 'video1'}
+      ];
+    </script>
   </body>
 </html>

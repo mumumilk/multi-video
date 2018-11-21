@@ -47,12 +47,10 @@ class MultiVideo extends PolymerElement {
           height: 50px;
         }
       </style>
-
       <div class="videos-container">
-        <video class="video" id="video0" src={{url}}></video>
-        <video class="video" id="video1" src={{url}}></video>
-        <video class="video" id="video2" src={{url}}></video>
-        <video class="video" id="video3" src={{url}}></video>
+        <template is="dom-repeat" items="[[videos]]">
+          <video class="video" id="[[item.id]]" src=[[item.url]]></video>
+        </template>
         <div class="controls">
           <button on-click="handleClick" type="button">Click Me!</button>
         </div>
@@ -62,9 +60,9 @@ class MultiVideo extends PolymerElement {
   }
   static get properties() {
     return {
-      url: {
-        type: String,
-        value: 'http://techslides.com/demos/sample-videos/small.mp4'
+      videos: {
+        type: Array,
+        value: []
       }
     };
   }
