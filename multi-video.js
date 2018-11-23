@@ -1,24 +1,56 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { mixinBehaviors } from '@polymer/polymer/lib/legacy/class.js';
+
+import '@polymer/iron-icon/iron-icon.js';
+import '@polymer/iron-icons/iron-icons.js';
+import { PaperButtonBehavior } from '@polymer/paper-behaviors/paper-button-behavior.js';
+import '@polymer/paper-slider';
 import '@vaadin/vaadin-context-menu/vaadin-context-menu.js';
 
-/**
- * `multi-video`
- * Webcomponent para rodar vários vídeos em sincronia
- *
- * @customElement
- * @polymer
- * @demo demo/index.html
- */
-class MultiVideo extends PolymerElement {
+const VideoState = Object.freeze({
+  PLAYING: 'playing',
+  PAUSED: 'paused',
+  ENDED: 'ended',
+  BUFFERING: 'buffering'
+});
+
+const VideoDisplay = Object.freeze({
+  FULLSCREEN: 'fullscreen',
+  NORMAL: 'normal'
+});
+
+const VideoOrientation = Object.freeze({
+  PORTRAIT: 'portrait',
+  LANDSCAPE: 'landscape'
+});
+
+class MultiVideo extends mixinBehaviors([PaperButtonBehavior], PolymerElement) {
   constructor() {
     super();
+    this.state = VideoState.PAUSED;
+  }
+
+  ready() {
+    super.ready();
+  }
+
+  toggleState(videoElement) {
+    switch (this.state) {
+      case VideoState.PAUSED: {
+        videoElement.play();
+        this.state = VideoState.PLAYING;
+      }
+      case VideoState.PLAYING: {
+        videoElement.pause();
+        this.state = VideoState.PAUSED;
+      }
+    }
   }
 
   handleClick() {
-    this.$.video0.play();
-    this.$.video1.play();
-    this.$.video2.play();
-    this.$.video3.play();
+    this.videos.forEach(video => {
+      this.toggleState(this.shadowRoot.querySelector(`#${video.id}`))
+    });
   }
 
   static get template() {
@@ -36,33 +68,92 @@ class MultiVideo extends PolymerElement {
         }
         .video {
           display: block;
-          width: 50%;
-          height: 50%;
+          width: 100%;
+          height: 100%;
           object-fit: fill;
           z-index: 99;
         }
-        .controls {
-          width: 100%;
-          background: rgba(0,0,0,0.7);
-          height: 50px;
-        }
       </style>
-      <div class="videos-container">
+
+      <div class="videos-container" id="teste">
+
         <template is="dom-repeat" items="[[videos]]">
           <video class="video" id="[[item.id]]" src=[[item.url]]></video>
         </template>
-        <div class="controls">
-          <button on-click="handleClick" type="button">Click Me!</button>
-        </div>
+
+        ${this.controlsTemplate}
+
       </div>
 
     `;
   }
+
+  static get controlsTemplate() {
+    return html`
+      <style>
+        .controls {
+          width: 100%;
+          background: rgba(0,0,0,0.5);
+          height: 50px;
+          display: flex;
+          flex-direction: row;
+          justify-content: space-around;
+          align-items: center;
+          padding: 5px;
+        }
+        iron-icon {
+          fill: var(--icon-toggle-color, rgb(255,255,255));
+        }
+        button:hover {
+          cursor: pointer;
+        }
+      </style>
+        <div class="controls">
+          <button
+            on-click="handleClick"
+            type="button"
+            style="border: none; background: transparent">
+            <iron-icon
+              icon="check">
+            </iron-icon>
+          </button>
+
+          <button
+            on-click="handleClick"
+            type="button"
+            style="border: none; background: transparent">
+            <iron-icon
+              icon="check">
+            </iron-icon>
+          </button>
+
+          <paper-slider
+            style="flex: 1"
+            value="50"
+            max="100">
+          </paper-slider>
+
+          <button
+            on-click="handleClick"
+            type="button"
+            style="border: none; background: transparent">
+            <iron-icon
+              icon="fullscreen">
+            </iron-icon>
+          </button>
+        </div>
+    `;
+  }
+
   static get properties() {
     return {
       videos: {
         type: Array,
         value: []
+      },
+      state: {
+        type: String,
+        value: VideoState.PAUSED
       }
     };
   }

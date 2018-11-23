@@ -8,5 +8,13 @@
   "sources": [
     "multi-video.js"
   ],
-  "shell": "multi-video.js"
+  "shell": "multi-video.js",
+  "builds": [
+    {
+      "name": "multi-video"
+    }
+  ],
+  "extraDependencies": [
+    "node_modules/@webcomponentsjs/**"
+  ]
 }

@@ -1,0 +1,27 @@
+{
+  "entrypoint": "index.html",
+  "shell": "multi-video.js",
+  "fragments": [],
+  "sources": [
+    "multi-video.js",
+    "index.html",
+    "multi-video.js"
+  ],
+  "extraDependencies": [
+    "bower_components/webcomponentsjs/*.js",
+    "node_modules/@webcomponentsjs/**"
+  ],
+  "builds": [
+    {
+      "name": "multi-video"
+    }
+  ],
+  "lint": {
+    "rules": [
+      "polymer-3"
+    ]
+  },
+  "npm": true,
+  "componentDir": "node_modules/",
+  "moduleResolution": "node"
+}
