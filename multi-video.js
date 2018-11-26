@@ -1,9 +1,9 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
-import { mixinBehaviors } from '@polymer/polymer/lib/legacy/class.js';
 
 import '@polymer/iron-icon/iron-icon.js';
 import '@polymer/iron-icons/iron-icons.js';
-import { PaperButtonBehavior } from '@polymer/paper-behaviors/paper-button-behavior.js';
+import '@polymer/iron-icons/av-icons';
+
 import '@polymer/paper-slider';
 import '@vaadin/vaadin-context-menu/vaadin-context-menu.js';
 
@@ -29,22 +29,31 @@ class MultiVideo extends PolymerElement {
     super();
     this.state = VideoState.PAUSED;
     this.duration = 0;
+    this.currentTime = 0;
   }
 
   ready() {
     super.ready();
   }
 
-  toggleState(videoElement) {
+  toggleState(videoElement) {debugger
     switch (this.state) {
       case VideoState.PAUSED: {
         videoElement.play();
+        this.icon = 'av:pause';
         this.state = VideoState.PLAYING;
         break;
       }
       case VideoState.PLAYING: {
         videoElement.pause();
+        this.icon = 'av:play-arrow';
         this.state = VideoState.PAUSED;
+        break;
+      }
+      case VideoState.ENDED: {
+        videoElement.play();
+        this.icon = 'av:pause';
+        this.state = VideoState.PLAYING;
         break;
       }
     }
@@ -54,9 +63,16 @@ class MultiVideo extends PolymerElement {
     this.duration = e.target.duration;
   }
 
-  formatTime(seconds) {
-    return 
-  } 
+  onTimeUpdate(e) {
+    this.currentTime = e.target.currentTime;
+    this.currentTimePercent = (this.currentTime * 100) / 5;
+  }
+
+  onVideoEnded(e) {
+    this.state = VideoState.ENDED;
+    this.icon = 'av:play-arrow';
+  }
+
 
   static get template() {
     return html`
@@ -83,7 +99,13 @@ class MultiVideo extends PolymerElement {
       <div class="videos-container" id="teste">
 
         <template is="dom-repeat" items="[[videos]]">
-          <video class="video" on-canplay="onVideoCanPlay" id="[[item.id]]" src=[[item.url]]></video>
+          <video
+            class="video"
+            on-timeupdate="onTimeUpdate"
+            on-canplay="onVideoCanPlay"
+            on-ended="onVideoEnded"
+            id="[[item.id]]"
+            src=[[item.url]]></video>
         </template>
 
         ${this.controlsTemplate}
@@ -118,6 +140,9 @@ class MultiVideo extends PolymerElement {
         button:hover {
           cursor: pointer;
         }
+        button:focus {
+          outline: 0;
+        }
         p, time {
           color: white;
         }
@@ -125,23 +150,25 @@ class MultiVideo extends PolymerElement {
         <div class="controls">
 
           <button
+            id="play"
             on-click="playOrPause"
             type="button"
             style="border: none; background: transparent">
             <iron-icon
-              icon="check">
+              icon="[[icon]]">
             </iron-icon>
           </button>
 
-          <p>00:00</p>
+          <p>[[toHHMMSS(currentTime)]]</p>
 
           <paper-slider
             style="flex: 1"
-            value="50"
-            max="100">
+            value="[[currentTimePercent]]"
+            max="100"
+            step="1">
           </paper-slider>
 
-          <time>[[duration]]</time>
+          <time>[[toHHMMSS(duration)]]</time>
 
           <button
             on-click="handleClick"
@@ -155,6 +182,19 @@ class MultiVideo extends PolymerElement {
     `;
   }
 
+  toHHMMSS(secs) {
+    var sec_num = parseInt(secs, 10); // don't forget the second param
+    var hours   = Math.floor(sec_num / 3600);
+    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+    if (hours   < 10) {hours   = "0"+hours;}
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+
+    return minutes + ':' + seconds;
+  }
+
   static get properties() {
     return {
       videos: {
@@ -164,6 +204,24 @@ class MultiVideo extends PolymerElement {
       state: {
         type: String,
         value: VideoState.PAUSED
+      },
+      icon: {
+        type: String,
+        value: 'av:play-arrow',
+        notify: true,
+        reflectToAttribute: true
+      },
+      currentTime: {
+        type: Number,
+        value: 0,
+        notify: true,
+        reflectToAttribute: true
+      },
+      currentTimePercent: {
+        type: Number,
+        value: 0,
+        notify: true,
+        reflectToAttribute: true
       }
     };
   }
