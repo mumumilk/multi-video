@@ -24,10 +24,11 @@ const VideoOrientation = Object.freeze({
   LANDSCAPE: 'landscape'
 });
 
-class MultiVideo extends mixinBehaviors([PaperButtonBehavior], PolymerElement) {
+class MultiVideo extends PolymerElement {
   constructor() {
     super();
     this.state = VideoState.PAUSED;
+    this.duration = 0;
   }
 
   ready() {
@@ -39,19 +40,23 @@ class MultiVideo extends mixinBehaviors([PaperButtonBehavior], PolymerElement) {
       case VideoState.PAUSED: {
         videoElement.play();
         this.state = VideoState.PLAYING;
+        break;
       }
       case VideoState.PLAYING: {
         videoElement.pause();
         this.state = VideoState.PAUSED;
+        break;
       }
     }
   }
 
-  handleClick() {
-    this.videos.forEach(video => {
-      this.toggleState(this.shadowRoot.querySelector(`#${video.id}`))
-    });
+  onVideoCanPlay(e) {
+    this.duration = e.target.duration;
   }
+
+  formatTime(seconds) {
+    return 
+  } 
 
   static get template() {
     return html`
@@ -78,7 +83,7 @@ class MultiVideo extends mixinBehaviors([PaperButtonBehavior], PolymerElement) {
       <div class="videos-container" id="teste">
 
         <template is="dom-repeat" items="[[videos]]">
-          <video class="video" id="[[item.id]]" src=[[item.url]]></video>
+          <video class="video" on-canplay="onVideoCanPlay" id="[[item.id]]" src=[[item.url]]></video>
         </template>
 
         ${this.controlsTemplate}
@@ -86,6 +91,12 @@ class MultiVideo extends mixinBehaviors([PaperButtonBehavior], PolymerElement) {
       </div>
 
     `;
+  }
+
+  playOrPause() {
+    this.videos.forEach(video => {
+      this.toggleState(this.shadowRoot.querySelector(`#${video.id}`))
+    });
   }
 
   static get controlsTemplate() {
@@ -107,10 +118,14 @@ class MultiVideo extends mixinBehaviors([PaperButtonBehavior], PolymerElement) {
         button:hover {
           cursor: pointer;
         }
+        p, time {
+          color: white;
+        }
       </style>
         <div class="controls">
+
           <button
-            on-click="handleClick"
+            on-click="playOrPause"
             type="button"
             style="border: none; background: transparent">
             <iron-icon
@@ -118,20 +133,15 @@ class MultiVideo extends mixinBehaviors([PaperButtonBehavior], PolymerElement) {
             </iron-icon>
           </button>
 
-          <button
-            on-click="handleClick"
-            type="button"
-            style="border: none; background: transparent">
-            <iron-icon
-              icon="check">
-            </iron-icon>
-          </button>
+          <p>00:00</p>
 
           <paper-slider
             style="flex: 1"
             value="50"
             max="100">
           </paper-slider>
+
+          <time>[[duration]]</time>
 
           <button
             on-click="handleClick"
