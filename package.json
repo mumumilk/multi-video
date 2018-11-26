@@ -2,7 +2,9 @@
   "name": "multi-video",
   "description": "Webcomponent para rodar vários vídeos em sincronia",
   "main": "multi-video.js",
+  "version": "0.0.0",
   "dependencies": {
+    "@polymer/font-roboto": "^3.0.2",
     "@polymer/iron-icons": "^3.0.1",
     "@polymer/paper-slider": "^3.0.1",
     "@polymer/polymer": "^3.0.0",

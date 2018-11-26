@@ -6,6 +6,7 @@ import '@polymer/iron-icons/av-icons';
 
 import '@polymer/paper-slider';
 import '@vaadin/vaadin-context-menu/vaadin-context-menu.js';
+import '@polymer/font-roboto';
 
 const VideoState = Object.freeze({
   PLAYING: 'playing',
@@ -85,12 +86,14 @@ class MultiVideo extends PolymerElement {
     this.icon = 'av:play-arrow';
   }
 
-
   static get template() {
     return html`
       <style>
         :host {
           display: block;
+        }
+        body {
+          font-family: Roboto;
         }
         .videos-container {
           height: 100%;
@@ -157,6 +160,7 @@ class MultiVideo extends PolymerElement {
         }
         p, time {
           color: white;
+          font-family: Roboto;
         }
       </style>
         <div class="controls">
@@ -182,15 +186,6 @@ class MultiVideo extends PolymerElement {
           </paper-slider>
 
           <time>[[toHHMMSS(duration)]]</time>
-
-          <button
-            on-click="handleClick"
-            type="button"
-            style="border: none; background: transparent">
-            <iron-icon
-              icon="fullscreen">
-            </iron-icon>
-          </button>
         </div>
     `;
   }
