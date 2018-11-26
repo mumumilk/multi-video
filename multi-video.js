@@ -30,13 +30,18 @@ class MultiVideo extends PolymerElement {
     this.state = VideoState.PAUSED;
     this.duration = 0;
     this.currentTime = 0;
+    this.videoEl = null;
   }
 
   ready() {
     super.ready();
   }
 
-  toggleState(videoElement) {debugger
+  connectedCallback() {
+    super.connectedCallback();
+  }
+
+  toggleState(videoElement) {
     switch (this.state) {
       case VideoState.PAUSED: {
         videoElement.play();
@@ -60,7 +65,14 @@ class MultiVideo extends PolymerElement {
   }
 
   onVideoCanPlay(e) {
-    this.duration = e.target.duration;
+    this.videoEl = e.target;
+    let videoDuration = this.duration = e.target.duration;
+    let video = this.videoEl = e.target;
+    let slideBar = this.$.ratings;
+
+    slideBar.addEventListener('change', function() {
+      video.currentTime =  (videoDuration * slideBar.value) / 100;
+    });
   }
 
   onTimeUpdate(e) {
@@ -162,6 +174,7 @@ class MultiVideo extends PolymerElement {
           <p>[[toHHMMSS(currentTime)]]</p>
 
           <paper-slider
+            id="ratings"
             style="flex: 1"
             value="[[currentTimePercent]]"
             max="100"
