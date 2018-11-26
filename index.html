@@ -4,16 +4,17 @@
     <meta charset="utf-8">
     <meta http-equiv="refresh" />
     <title>multi-video</title>
-    <script type="module" src="./multi-video.js"></script>
+    <script type="module" src="./veltec-multi-video.js"></script>
   </head>
   <body>
     <section style="max-width: 800px; height: 500px;">
-      <multi-video id="mv"></multi-video>
+      <veltec-multi-video id="mv"></veltec-multi-video>
   </section>
 
   <script>
     document.getElementById('mv').videos = [
-      {url: 'http://techslides.com/demos/sample-videos/small.mp4', id: 'video1'}
+      {url: 'http://techslides.com/demos/sample-videos/small.mp4', id: 'video1'},
+      {url: 'http://www.html5videoplayer.net/videos/toystory.mp4', id: 'video2'}
     ];
   </script>
   </body>

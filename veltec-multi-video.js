@@ -16,8 +16,8 @@ const VideoState = Object.freeze({
 });
 
 const VideoDisplay = Object.freeze({
-  FULLSCREEN: 'fullscreen',
-  NORMAL: 'normal'
+  AMPLIFIED: 'amplified',
+  REGULAR: 'regular'
 });
 
 const VideoOrientation = Object.freeze({
@@ -25,13 +25,49 @@ const VideoOrientation = Object.freeze({
   LANDSCAPE: 'landscape'
 });
 
-class MultiVideo extends PolymerElement {
+class Video {
+  constructor(element) {
+    this.element = element;
+    this.state = VideoState.PAUSED;
+    this.orientation = VideoOrientation.LANDSCAPE;
+    this.display = VideoDisplay.REGULAR;
+  }
+
+  get duration() {
+    this.element.duration;
+  }
+
+  get currentTime() {
+    return this.element.currentTime;
+  }
+
+  set currentTime(seconds) {
+    this.element.currentTime = seconds;
+  }
+
+  play() {
+    this.element.play();
+    this.state = VideoState.PLAYING;
+  }
+
+  pause() {
+    this.element.pause();
+    this.state = VideoState.PAUSED;
+  }
+
+  
+}
+
+class VeltecMultiVideo extends PolymerElement {
   constructor() {
     super();
+    this.videoArray = [];
+
     this.state = VideoState.PAUSED;
     this.duration = 0;
     this.currentTime = 0;
     this.videoEl = null;
+    this.highest
   }
 
   ready() {
@@ -42,48 +78,63 @@ class MultiVideo extends PolymerElement {
     super.connectedCallback();
   }
 
-  toggleState(videoElement) {
-    switch (this.state) {
-      case VideoState.PAUSED: {
-        videoElement.play();
-        this.icon = 'av:pause';
-        this.state = VideoState.PLAYING;
-        break;
-      }
-      case VideoState.PLAYING: {
-        videoElement.pause();
-        this.icon = 'av:play-arrow';
-        this.state = VideoState.PAUSED;
-        break;
-      }
-      case VideoState.ENDED: {
-        videoElement.play();
-        this.icon = 'av:pause';
-        this.state = VideoState.PLAYING;
-        break;
-      }
-    }
+  toggleState() {debugger
+    this.videoArray.forEach(video => video.play());
+    // switch (this.state) {
+    //   case VideoState.PAUSED: {
+    //     this.playAll();
+    //     break;
+    //   }
+    //   case VideoState.PLAYING: {
+    //     this.pauseAll();
+    //     break;
+    //   }
+    //   case VideoState.ENDED: {
+    //     this.playAll();
+    //     break;
+    //   }
+    // }
+  }
+
+  playAll() {
+    this.videos.forEach(video => {
+      this.shadowRoot.querySelector(`#${video.id}`).play();
+    });
+    this.state = VideoState.PLAYING;
+    this.icon = 'av:pause';
+  }
+
+  pauseAll() {
+    this.videos.forEach(video => {
+      this.shadowRoot.querySelector(`#${video.id}`).pause();
+    });
+    this.state = VideoState.PAUSED;
+    this.icon = 'av:play-arrow';
   }
 
   onVideoCanPlay(e) {
+    this.videoArray.push(new Video(e.target));
+
     this.videoEl = e.target;
     let videoDuration = this.duration = e.target.duration;
     let video = this.videoEl = e.target;
     let slideBar = this.$.ratings;
 
-    slideBar.addEventListener('change', function() {
-      video.currentTime =  (videoDuration * slideBar.value) / 100;
-    });
+    // slideBar.addEventListener('change', function() {
+    //   video.currentTime =  (videoDuration * slideBar.value) / 100;
+    // });
   }
 
   onTimeUpdate(e) {
-    this.currentTime = e.target.currentTime;
-    this.currentTimePercent = (this.currentTime * 100) / 5;
+    // this.currentTime = e.target.currentTime;
+    // this.currentTimePercent = (this.currentTime * 100) / this.duration;
   }
 
   onVideoEnded(e) {
-    this.state = VideoState.ENDED;
-    this.icon = 'av:play-arrow';
+    e.target.load();
+    
+    // this.state = VideoState.ENDED;
+    // this.icon = 'av:play-arrow';
   }
 
   static get template() {
@@ -99,15 +150,17 @@ class MultiVideo extends PolymerElement {
           height: 100%;
           width: 100%;
           display: flex;
+          flex-direction: row;
           flex-wrap: wrap;
           background-color: #0e0e0e;
         }
         .video {
           display: block;
-          width: 100%;
+          width: 50%;
           height: 100%;
           object-fit: fill;
           z-index: 99;
+          flex: 1;
         }
       </style>
 
@@ -120,20 +173,24 @@ class MultiVideo extends PolymerElement {
             on-canplay="onVideoCanPlay"
             on-ended="onVideoEnded"
             id="[[item.id]]"
+            poster="http://i68.tinypic.com/20zae12.png"
             src=[[item.url]]></video>
         </template>
 
         ${this.controlsTemplate}
 
+        <veltec-video></veltec-video>
       </div>
 
     `;
   }
 
   playOrPause() {
-    this.videos.forEach(video => {
-      this.toggleState(this.shadowRoot.querySelector(`#${video.id}`))
-    });
+    this.toggleState();
+    // this.videos.forEach(video => {
+    //   this.shadowRoot.querySelector(`#${video.id}`).play();
+    //   this.toggleState(this.shadowRoot.querySelector(`#${video.id}`))
+    // });
   }
 
   static get controlsTemplate() {
@@ -182,7 +239,7 @@ class MultiVideo extends PolymerElement {
             style="flex: 1"
             value="[[currentTimePercent]]"
             max="100"
-            step="1">
+            step="0.1">
           </paper-slider>
 
           <time>[[toHHMMSS(duration)]]</time>
@@ -236,4 +293,4 @@ class MultiVideo extends PolymerElement {
 }
 
 
-window.customElements.define('multi-video', MultiVideo);
+window.customElements.define('veltec-multi-video', VeltecMultiVideo);
