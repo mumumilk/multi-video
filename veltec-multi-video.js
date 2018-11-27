@@ -5,7 +5,6 @@ import '@polymer/iron-icons/iron-icons.js';
 import '@polymer/iron-icons/av-icons';
 
 import '@polymer/paper-slider';
-import '@vaadin/vaadin-context-menu/vaadin-context-menu.js';
 import '@polymer/font-roboto';
 
 import { VideoState } from  './veltec-video.js';
@@ -33,7 +32,6 @@ class VeltecMultiVideo extends PolymerElement {
   }
 
   onMasterTimeUpdate(ev) {
-    console.log('time uopdate')
     this.masterCurrentTime = ev.detail.currentTime;
     this.masterCurrentPercentage = (ev.detail.currentTime * 100) / this.masterDuration
   }
@@ -105,24 +103,34 @@ class VeltecMultiVideo extends PolymerElement {
         body {
           font-family: Roboto;
         }
+        .super-container {
+          height: 100%;
+          width: 100%;
+          /* display: flex;
+          flex-direction: row;
+          flex-wrap: wrap; */
+          /* background-color: #0e0e0e; */
+        }
         .videos-container {
           height: 100%;
           width: 100%;
-          display: flex;
-          flex-direction: row;
-          flex-wrap: wrap;
+          display: grid;
+          grid-template-columns: 50% 50%;
+          grid-template-rows: 50% 50%;
           background-color: #0e0e0e;
         }
       </style>
 
-      <div class="videos-container" id="teste">
+      <div class="super-container" id="teste">
 
-        <template is="dom-repeat" items="[[videos]]">
-            <veltec-video
-              url="[[item.url]]"
-              id="[[item.id]]">
-            </veltec-video>
-        </template>
+        <div class="videos-container">
+          <template is="dom-repeat" items="[[videos]]">
+              <veltec-video
+                url="[[item.url]]"
+                id="[[item.id]]">
+              </veltec-video>
+          </template>
+        </div>
 
         ${this.controlsTemplate}
       </div>

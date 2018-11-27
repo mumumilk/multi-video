@@ -6,12 +6,12 @@
     ]
   },
   "sources": [
-    "multi-video.js"
+    "veltec-multi-video.js"
   ],
-  "shell": "multi-video.js",
+  "shell": "veltec-multi-video.js",
   "builds": [
     {
-      "name": "multi-video"
+      "name": "veltec-multi-video"
     }
   ],
   "extraDependencies": [

@@ -1,7 +1,7 @@
 {
-  "name": "multi-video",
+  "name": "veltec-multi-video",
   "description": "Webcomponent para rodar vários vídeos em sincronia",
-  "main": "multi-video.js",
+  "main": "veltec-multi-video.js",
   "version": "0.0.0",
   "dependencies": {
     "@polymer/font-roboto": "^3.0.2",
