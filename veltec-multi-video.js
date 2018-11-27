@@ -8,133 +8,87 @@ import '@polymer/paper-slider';
 import '@vaadin/vaadin-context-menu/vaadin-context-menu.js';
 import '@polymer/font-roboto';
 
-const VideoState = Object.freeze({
-  PLAYING: 'playing',
-  PAUSED: 'paused',
-  ENDED: 'ended',
-  BUFFERING: 'buffering'
-});
-
-const VideoDisplay = Object.freeze({
-  AMPLIFIED: 'amplified',
-  REGULAR: 'regular'
-});
-
-const VideoOrientation = Object.freeze({
-  PORTRAIT: 'portrait',
-  LANDSCAPE: 'landscape'
-});
-
-class Video {
-  constructor(element) {
-    this.element = element;
-    this.state = VideoState.PAUSED;
-    this.orientation = VideoOrientation.LANDSCAPE;
-    this.display = VideoDisplay.REGULAR;
-  }
-
-  get duration() {
-    this.element.duration;
-  }
-
-  get currentTime() {
-    return this.element.currentTime;
-  }
-
-  set currentTime(seconds) {
-    this.element.currentTime = seconds;
-  }
-
-  play() {
-    this.element.play();
-    this.state = VideoState.PLAYING;
-  }
-
-  pause() {
-    this.element.pause();
-    this.state = VideoState.PAUSED;
-  }
-
-  
-}
+import { VideoState } from  './veltec-video.js';
+import './veltec-controls.js';
 
 class VeltecMultiVideo extends PolymerElement {
   constructor() {
     super();
     this.videoArray = [];
-
     this.state = VideoState.PAUSED;
-    this.duration = 0;
-    this.currentTime = 0;
-    this.videoEl = null;
-    this.highest
+
+    this.addEventListener('timeUpdate', this.onMasterTimeUpdate);
+    this.addEventListener('newVideo', this.onNewVideoAttached);
+    this.addEventListener('videoEnded', this.onMasterEnd);
+    this.addEventListener('change', function() {});
   }
 
-  ready() {
-    super.ready();
+  onNewVideoAttached(ev) {
+    this.videoArray.push(ev.detail.video);
+    this.setMasterVideo();
   }
 
-  connectedCallback() {
-    super.connectedCallback();
+  onMasterEnd(ev) {
+    this.setAsPaused();
   }
 
-  toggleState() {debugger
-    this.videoArray.forEach(video => video.play());
-    // switch (this.state) {
-    //   case VideoState.PAUSED: {
-    //     this.playAll();
-    //     break;
-    //   }
-    //   case VideoState.PLAYING: {
-    //     this.pauseAll();
-    //     break;
-    //   }
-    //   case VideoState.ENDED: {
-    //     this.playAll();
-    //     break;
-    //   }
-    // }
+  onMasterTimeUpdate(ev) {
+    console.log('time uopdate')
+    this.masterCurrentTime = ev.detail.currentTime;
+    this.masterCurrentPercentage = (ev.detail.currentTime * 100) / this.masterDuration
   }
 
-  playAll() {
-    this.videos.forEach(video => {
-      this.shadowRoot.querySelector(`#${video.id}`).play();
-    });
-    this.state = VideoState.PLAYING;
-    this.icon = 'av:pause';
+  setMasterVideo() {
+    if (this.videoArray.length !== this.videos.length) {
+      return;
+    }
+
+    const longestDuration = Math.max(...this.videoArray.map(video => video.duration));
+    this.masterDuration = longestDuration;
+  
+    const longestVideo = this.videoArray.find(video => video.duration === longestDuration)
+    longestVideo.isMaster = true;
   }
 
-  pauseAll() {
-    this.videos.forEach(video => {
-      this.shadowRoot.querySelector(`#${video.id}`).pause();
-    });
+  playOrPause() {
+    switch (this.state) {
+      case VideoState.PLAYING: {
+        this.pauseAllVideos();
+        break;
+      }
+      case VideoState.PAUSED: 
+      case VideoState.ENDED: {
+        this.playAllVideos();
+        break;
+      }
+    }
+  }
+
+  pauseAllVideos() {
+    this.videoArray.forEach(video => video.pause());
+    this.setAsPaused();
+  }
+
+  playAllVideos() {
+    if (this.state === VideoState.ENDED) {
+      this.videoArray.forEach(video => video.play());
+    } else {
+      this.videoArray.forEach(video => {
+        if (!video.ended) { video.play(); }
+      });
+    }
+
+    this.setAsPlaying();
+  }
+
+  setAsPaused() {
     this.state = VideoState.PAUSED;
     this.icon = 'av:play-arrow';
   }
 
-  onVideoCanPlay(e) {
-    this.videoArray.push(new Video(e.target));
-
-    this.videoEl = e.target;
-    let videoDuration = this.duration = e.target.duration;
-    let video = this.videoEl = e.target;
-    let slideBar = this.$.ratings;
-
-    // slideBar.addEventListener('change', function() {
-    //   video.currentTime =  (videoDuration * slideBar.value) / 100;
-    // });
-  }
-
-  onTimeUpdate(e) {
-    // this.currentTime = e.target.currentTime;
-    // this.currentTimePercent = (this.currentTime * 100) / this.duration;
-  }
-
-  onVideoEnded(e) {
-    e.target.load();
-    
-    // this.state = VideoState.ENDED;
-    // this.icon = 'av:play-arrow';
+  setAsPlaying() {
+    this.state = VideoState.PLAYING;
+    this.icon = 'av:pause';
   }
 
   static get template() {
@@ -154,43 +108,20 @@ class VeltecMultiVideo extends PolymerElement {
           flex-wrap: wrap;
           background-color: #0e0e0e;
         }
-        .video {
-          display: block;
-          width: 50%;
-          height: 100%;
-          object-fit: fill;
-          z-index: 99;
-          flex: 1;
-        }
       </style>
 
       <div class="videos-container" id="teste">
 
         <template is="dom-repeat" items="[[videos]]">
-          <video
-            class="video"
-            on-timeupdate="onTimeUpdate"
-            on-canplay="onVideoCanPlay"
-            on-ended="onVideoEnded"
-            id="[[item.id]]"
-            poster="http://i68.tinypic.com/20zae12.png"
-            src=[[item.url]]></video>
+            <veltec-video
+              url="[[item.url]]"
+              id="[[item.id]]">
+            </veltec-video>
         </template>
 
         ${this.controlsTemplate}
-
-        <veltec-video></veltec-video>
       </div>
-
     `;
-  }
-
-  playOrPause() {
-    this.toggleState();
-    // this.videos.forEach(video => {
-    //   this.shadowRoot.querySelector(`#${video.id}`).play();
-    //   this.toggleState(this.shadowRoot.querySelector(`#${video.id}`))
-    // });
   }
 
   static get controlsTemplate() {
@@ -232,17 +163,17 @@ class VeltecMultiVideo extends PolymerElement {
             </iron-icon>
           </button>
 
-          <p>[[toHHMMSS(currentTime)]]</p>
+          <p>[[toHHMMSS(masterCurrentTime)]]</p>
 
           <paper-slider
-            id="ratings"
+            id="paperSlider"
             style="flex: 1"
-            value="[[currentTimePercent]]"
+            value="[[masterCurrentPercentage]]"
             max="100"
             step="0.1">
           </paper-slider>
 
-          <time>[[toHHMMSS(duration)]]</time>
+          <p>[[toHHMMSS(masterDuration)]]</p>
         </div>
     `;
   }
@@ -258,7 +189,7 @@ class VeltecMultiVideo extends PolymerElement {
     if (seconds < 10) {seconds = "0"+seconds;}
 
     return minutes + ':' + seconds;
-  }
+}
 
   static get properties() {
     return {
@@ -266,23 +197,25 @@ class VeltecMultiVideo extends PolymerElement {
         type: Array,
         value: []
       },
-      state: {
-        type: String,
-        value: VideoState.PAUSED
-      },
       icon: {
         type: String,
         value: 'av:play-arrow',
         notify: true,
         reflectToAttribute: true
       },
-      currentTime: {
+      masterDuration: {
         type: Number,
         value: 0,
         notify: true,
         reflectToAttribute: true
       },
-      currentTimePercent: {
+      masterCurrentTime: {
+        type: Number,
+        value: 0,
+        notify: true,
+        reflectToAttribute: true
+      },
+      masterCurrentPercentage: {
         type: Number,
         value: 0,
         notify: true,
