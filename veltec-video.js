@@ -34,9 +34,13 @@ class Video {
         return this.element.currentTime;
     }
 
-    set currentTimeSecs(seconds) {
-        if (seconds > this.duration || this.ended) {
+    set currentTime(seconds) {
+        if (seconds > this.duration) {
             return;
+        }
+
+        if (this.ended) {
+            this.play();
         }
 
         this.element.currentTime = seconds;

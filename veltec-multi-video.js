@@ -20,7 +20,7 @@ class VeltecMultiVideo extends PolymerElement {
     this.addEventListener('timeUpdate', this.onMasterTimeUpdate);
     this.addEventListener('newVideo', this.onNewVideoAttached);
     this.addEventListener('videoEnded', this.onMasterEnd);
-    this.addEventListener('change', function() {});
+    this.addEventListener('change', this.setTimeForAllVideos);
   }
 
   onNewVideoAttached(ev) {
@@ -79,6 +79,11 @@ class VeltecMultiVideo extends PolymerElement {
     }
 
     this.setAsPlaying();
+  }
+
+  setTimeForAllVideos() {
+    const newTime = (this.$.paperSlider.value * this.masterDuration) / 100;
+    this.videoArray.forEach(video => video.currentTime = newTime);
   }
 
   setAsPaused() {
