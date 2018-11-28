@@ -1,5 +1,9 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 
+import '@vaadin/vaadin-context-menu/vaadin-context-menu.js';
+import '@vaadin/vaadin-list-box/vaadin-list-box.js';
+import '@vaadin/vaadin-item/vaadin-item.js';
+
 export const VideoState = Object.freeze({
     PLAYING: 'playing',
     PAUSED: 'paused',
@@ -13,8 +17,13 @@ const VideoSize = Object.freeze({
 });
 
 const VideoOrientation = Object.freeze({
-    PORTRAIT: 'portrait',
-    LANDSCAPE: 'landscape'
+    LANDSCAPE: 0,
+    PORTRAIT: 1
+});
+
+const VideoRotation = Object.freeze({
+    CLOCKWISE: 'right',
+    COUNTERCLOCKWISE: 'left'
 });
 
 class Video {
@@ -24,6 +33,7 @@ class Video {
         this.orientation = VideoOrientation.LANDSCAPE;
         this.display = VideoSize.REGULAR;
         this.isMaster = false;
+        this.currentRotationDegrees = 0;
     }
 
     get duration() {
@@ -65,6 +75,26 @@ class Video {
     showPosterImage() {
         this.element.load();
     }
+
+    rotate(rotation) {
+        switch (rotation) {
+            case VideoRotation.CLOCKWISE: {
+                this.currentRotationDegrees += 90;
+                this.element.style['transform'] = `rotate(${this.currentRotationDegrees}deg)`;
+            } break;
+            case VideoRotation.COUNTERCLOCKWISE: {
+                this.currentRotationDegrees -= 90;
+                this.element.style['transform'] = `rotate(${this.currentRotationDegrees}deg)`;
+            } break;
+            default: break;
+        }
+
+        this.toggleOrientation();
+    }
+
+    toggleOrientation() {
+        this.orientation = this.orientation === VideoOrientation.LANDSCAPE ? VideoOrientation.PORTRAIT : VideoOrientation.LANDSCAPE;
+    }
 }
 
 class VeltecVideo extends PolymerElement {
@@ -84,7 +114,7 @@ class VeltecVideo extends PolymerElement {
     }
 
     onVideoCanPlay(ev) {
-        this.dispatch('newVideo', {video: this.video})
+        this.dispatch('newVideo', {video: this.video});
     }
 
     onVideoEnded(ev) {
@@ -101,6 +131,14 @@ class VeltecVideo extends PolymerElement {
         });
 
         this.dispatchEvent(ev);
+    }
+
+    rotateLeft() {
+        this.video.rotate(VideoRotation.COUNTERCLOCKWISE);
+    }
+
+    rotateRight() {
+        this.video.rotate(VideoRotation.CLOCKWISE);
     }
 
     static get template() {
@@ -123,15 +161,23 @@ class VeltecVideo extends PolymerElement {
                     overflow: hidden;
                 }
             </style>
-            <video
-                on-timeupdate="onTimeUpdate"
-                on-canplay="onVideoCanPlay"
-                on-ended="onVideoEnded"
-                class="video"
-                id="[]"
-                poster="http://i68.tinypic.com/20zae12.png"
-                src=[[url]]>
-            </video>
+            <vaadin-context-menu>
+                <template>
+                    <vaadin-list-box>
+                    <vaadin-item on-click="rotateRight">90° para a direita</vaadin-item>
+                    <vaadin-item on-click="rotateLeft">90° para a esquerda</vaadin-item>
+                    </vaadin-list-box>
+                </template>
+                <video
+                    on-timeupdate="onTimeUpdate"
+                    on-canplay="onVideoCanPlay"
+                    on-ended="onVideoEnded"
+                    class="video"
+                    id="[]"
+                    poster="http://i68.tinypic.com/20zae12.png"
+                    src=[[url]]>
+                </video>
+            </vaadin-context-menu>
         `;
     }
 
