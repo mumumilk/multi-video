@@ -17,7 +17,7 @@ export const VideoState = Object.freeze({
     BUFFERING: 'buffering'
 });
 
-const VideoSize = Object.freeze({
+export const VideoSize = Object.freeze({
     AMPLIFIED: 'amplified',
     REGULAR: 'regular'
 });
@@ -37,7 +37,7 @@ class Video {
         this.element = element;
         this.state = VideoState.PAUSED;
         this.orientation = VideoOrientation.LANDSCAPE;
-        this.display = VideoSize.REGULAR;
+        this.size = VideoSize.REGULAR;
         this.isMaster = false;
         this.currentRotationDegrees = 0;
     }
@@ -96,11 +96,16 @@ class Video {
         }
 
         this.toggleOrientation();
-        this.setSizeAccordingToOrientation();
     }
 
     toggleOrientation() {
         this.orientation = this.orientation === VideoOrientation.LANDSCAPE ? VideoOrientation.PORTRAIT : VideoOrientation.LANDSCAPE;
+        this.setSizeAccordingToOrientation();
+    }
+
+    toggleSize() {
+        this.size = this.size === VideoSize.AMPLIFIED ? VideoSize.REGULAR : VideoSize.AMPLIFIED;
+        this.setSizeAccordingToOrientation();
     }
 
     setSizeAccordingToOrientation() {
@@ -147,6 +152,11 @@ class VeltecVideo extends PolymerElement {
         this.dispatch('newVideo', {video: this.video});
     }
 
+    onVideoClicked() {
+        this.dispatch('videoClicked', {currentSize: this.video.size});
+        this.video.toggleSize();
+    }
+
     onVideoEnded(ev) {
         if (this.video.isMaster) {
             this.dispatch('videoEnded', null);
@@ -177,13 +187,15 @@ class VeltecVideo extends PolymerElement {
                 .video {
                     height: 100%;
                     width: 100%;
-                    /*align-items: center;
+                    object-fit: fill;
+                }
+                vaadin-context-menu {
+                    height: 100%;
+                    display: flex;
                     justify-content: center;
-                    overflow: hidden; */
-                    object-fit: fill !important;
                 }
             </style>
-            <vaadin-context-menu>
+            <vaadin-context-menu override>
                 <template>
                     <paper-listbox>
                         <paper-item disabled>
@@ -203,6 +215,7 @@ class VeltecVideo extends PolymerElement {
                     on-timeupdate="onTimeUpdate"
                     on-canplay="onVideoCanPlay"
                     on-ended="onVideoEnded"
+                    on-click="onVideoClicked"
                     class="video"
                     id="[]"
                     poster="http://i68.tinypic.com/20zae12.png"

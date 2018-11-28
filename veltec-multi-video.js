@@ -7,7 +7,7 @@ import '@polymer/iron-icons/av-icons';
 import '@polymer/paper-slider';
 import '@polymer/font-roboto';
 
-import { VideoState } from  './veltec-video.js';
+import { VideoState, VideoSize } from  './veltec-video.js';
 import './veltec-controls.js';
 
 class VeltecMultiVideo extends PolymerElement {
@@ -20,11 +20,28 @@ class VeltecMultiVideo extends PolymerElement {
     this.addEventListener('newVideo', this.onNewVideoAttached);
     this.addEventListener('videoEnded', this.onMasterEnd);
     this.addEventListener('change', this.setTimeForAllVideos);
+    this.addEventListener('videoClicked', this.videoClicked);
+  }
+
+  videoClicked(ev) {
+    const videoElement = ev.path[0];
+
+    if (ev.detail.currentSize === VideoSize.AMPLIFIED) {
+      videoElement.style['gridArea'] = '';
+      this.setFirstVideoCSS();
+      return;
+    }
+
+    videoElement.style['gridArea'] = `1 / 1 / ${this.template + 1} / ${this.template + 1}`;
   }
 
   onNewVideoAttached(ev) {
     this.videoArray.push(ev.detail.video);
-    this.setMasterVideo();
+
+    if (this.allVideosAreLoaded) {
+      this.setMasterVideo();
+      this.setFirstVideoCSS();
+    }
   }
 
   onMasterEnd(ev) {
@@ -36,26 +53,25 @@ class VeltecMultiVideo extends PolymerElement {
     this.masterCurrentPercentage = (ev.detail.currentTime * 100) / this.masterDuration
   }
 
-  setMasterVideo() {
-    if (this.videoArray.length !== this.videos.length) {
-      return;
-    }
+  get allVideosAreLoaded() {
+    return this.videoArray.length === this.videos.length;
+  }
 
+  setMasterVideo() {
     const longestDuration = Math.max(...this.videoArray.map(video => video.duration));
     this.masterDuration = longestDuration;
   
     const longestVideo = this.videoArray.find(video => video.duration === longestDuration)
     longestVideo.isMaster = true;
-  
-    if (this.template === GridTemplate.TEMPLATE3) {
-      let elem = this.shadowRoot.querySelector(`#${this.videos[0].id}`);
-      elem.style['gridArea'] = '1 / 1 / 3 / 3';
-      elem.style['display'] = 'inline-flex';
-    }
+  }
 
-    if (this.template === GridTemplate.TEMPLATE1) {
-      let elem = this.shadowRoot.querySelector(`#${this.videos[0].id}`);
-      elem.style['display'] = 'contents';
+  setFirstVideoCSS() {
+    const firstVideo = this.shadowRoot.querySelector(`#${this.videos[0].id}`);
+
+    switch (this.template) {
+      case GridTemplate.TEMPLATE3: {
+        firstVideo.style['gridArea'] = '1 / 1 / 3 / 3';
+      }
     }
   }
 
@@ -119,10 +135,7 @@ class VeltecMultiVideo extends PolymerElement {
           grid-template-columns: 50% 50%;
           grid-template-rows: 50% 50%;
           background-color: #0e0e0e;
-        }
-        .full {
-          display: inline-flex;
-          justify-content: center;
+          overflow: hidden;
         }
         .fill {
           height: 100%;
@@ -134,7 +147,7 @@ class VeltecMultiVideo extends PolymerElement {
 
         <div class="videos-container fill" id="template">
           <template is="dom-repeat" items="[[videos]]" >
-              <veltec-video class="full fill"
+              <veltec-video class="fill"
                 url="[[item.url]]"
                 id="[[item.id]]">
               </veltec-video>
@@ -225,7 +238,6 @@ class VeltecMultiVideo extends PolymerElement {
 
   setContainerTemplate() {
     this.$.template.style['grid-template-columns'] = `repeat(${this.template}, ${(100/this.template).toFixed(2)}%)`;
-    // this.$.template.style['grid-template-rows'] = `repeat(2, 50%)`;
     this.$.template.style['grid-template-rows'] = `repeat(${this.template}, ${(100/this.template).toFixed(2)}%)`;
   }
 
