@@ -46,6 +46,16 @@ class VeltecMultiVideo extends PolymerElement {
   
     const longestVideo = this.videoArray.find(video => video.duration === longestDuration)
     longestVideo.isMaster = true;
+  
+    if (this.template === GridTemplate.TEMPLATE3) {
+      debugger
+      let elem = this.shadowRoot.querySelector(`#${this.videos[0].id}`);
+      elem.style['gridColumnStart'] = '1'
+      elem.style['gridColumnEnd'] = '3'
+      elem.style['gridRowEnd'] = '3'
+      elem.style['gridRowStart'] = '1'
+      elem.style['display'] = 'inline-flex'
+    }
   }
 
   playOrPause() {
@@ -106,8 +116,6 @@ class VeltecMultiVideo extends PolymerElement {
         .super-container {
           height: 100%;
           width: 100%;
-          display: flex;
-          flex-direction: column;
         }
         .videos-container {
           height: 100%;
@@ -117,13 +125,16 @@ class VeltecMultiVideo extends PolymerElement {
           grid-template-rows: 50% 50%;
           background-color: #0e0e0e;
         }
+        .full {
+          display: contents;
+        }
       </style>
 
       <div class="super-container">
 
         <div class="videos-container" id="template">
-          <template is="dom-repeat" items="[[videos]]">
-              <veltec-video
+          <template is="dom-repeat" items="[[videos]]" >
+              <veltec-video class="full"
                 url="[[item.url]]"
                 id="[[item.id]]">
               </veltec-video>
@@ -139,7 +150,7 @@ class VeltecMultiVideo extends PolymerElement {
     return html`
       <style>
         .controls {
-          background: rgba(0,0,0,0.7);
+          background: black;
           display: flex;
           z-index: 999;
           flex-direction: row;
@@ -214,6 +225,7 @@ class VeltecMultiVideo extends PolymerElement {
 
   setContainerTemplate() {
     this.$.template.style['grid-template-columns'] = `repeat(${this.template}, ${(100/this.template).toFixed(2)}%)`;
+    // this.$.template.style['grid-template-rows'] = `repeat(2, 50%)`;
     this.$.template.style['grid-template-rows'] = `repeat(${this.template}, ${(100/this.template).toFixed(2)}%)`;
   }
 

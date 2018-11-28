@@ -150,22 +150,13 @@ class VeltecVideo extends PolymerElement {
     static get template() {
         return html`
             <style>
-                .video2 {
-                    display: block;
-                    width: 50%;
-                    height: 100%;
-                    object-fit: fill;
-                    z-index: 99;
-                    flex: 1;
-                }
                 .video {
                     height: 100%;
                     width: 100%;
-                    display: flex;
-                    align-items: center;
+                    /*align-items: center;
                     justify-content: center;
-                    overflow: hidden;
-                    object-fit: fill
+                    overflow: hidden; */
+                    object-fit: fill !important;
                 }
             </style>
             <vaadin-context-menu>
