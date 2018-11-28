@@ -106,10 +106,8 @@ class VeltecMultiVideo extends PolymerElement {
         .super-container {
           height: 100%;
           width: 100%;
-          /* display: flex;
-          flex-direction: row;
-          flex-wrap: wrap; */
-          /* background-color: #0e0e0e; */
+          display: flex;
+          flex-direction: column;
         }
         .videos-container {
           height: 100%;
@@ -121,9 +119,9 @@ class VeltecMultiVideo extends PolymerElement {
         }
       </style>
 
-      <div class="super-container" id="teste">
+      <div class="super-container">
 
-        <div class="videos-container">
+        <div class="videos-container" id="template">
           <template is="dom-repeat" items="[[videos]]">
               <veltec-video
                 url="[[item.url]]"
@@ -141,10 +139,9 @@ class VeltecMultiVideo extends PolymerElement {
     return html`
       <style>
         .controls {
-          width: 100%;
-          background: rgba(0,0,0,0.5);
-          height: 50px;
+          background: rgba(0,0,0,0.7);
           display: flex;
+          z-index: 999;
           flex-direction: row;
           justify-content: space-around;
           align-items: center;
@@ -192,7 +189,7 @@ class VeltecMultiVideo extends PolymerElement {
   }
 
   toHHMMSS(secs) {
-    var sec_num = parseInt(secs, 10); // don't forget the second param
+    var sec_num = parseInt(secs, 10);
     var hours   = Math.floor(sec_num / 3600);
     var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
     var seconds = sec_num - (hours * 3600) - (minutes * 60);
@@ -202,13 +199,30 @@ class VeltecMultiVideo extends PolymerElement {
     if (seconds < 10) {seconds = "0"+seconds;}
 
     return minutes + ':' + seconds;
-}
+  }
+
+  videosChanged(videos) {
+    switch (videos.length) {
+      case 1: this.template = GridTemplate.TEMPLATE1; break;
+      case 2: case 3: case 4: this.template = GridTemplate.TEMPLATE2; break;
+      case 5: case 6: this.template = GridTemplate.TEMPLATE3; break;
+      default: this.template = GridTemplate.TEMPLATE1; break;
+    }
+
+    this.setContainerTemplate();
+  }
+
+  setContainerTemplate() {
+    this.$.template.style['grid-template-columns'] = `repeat(${this.template}, ${(100/this.template).toFixed(2)}%)`;
+    this.$.template.style['grid-template-rows'] = `repeat(${this.template}, ${(100/this.template).toFixed(2)}%)`;
+  }
 
   static get properties() {
     return {
       videos: {
         type: Array,
-        value: []
+        value: [],
+        observer: 'videosChanged'
       },
       icon: {
         type: String,
@@ -233,10 +247,33 @@ class VeltecMultiVideo extends PolymerElement {
         value: 0,
         notify: true,
         reflectToAttribute: true
+      },
+      template: {
+        type: Number,
+        value: GridTemplate.TEMPLATE1,
+        notify: true,
+        reflectToAttribute: true
       }
     };
   }
 }
 
+const GridTemplate = Object.freeze({
+  //  ______________
+  // |              |
+  // |              |
+  // |______________|
+  TEMPLATE1: 1,
+  //  ______________
+  // |       |      |
+  // |-------|------|
+  // |_______|______|
+  TEMPLATE2: 2,
+  //  ______________
+  // |         |____|
+  // |_________|____|
+  // |____|____|____|
+  TEMPLATE3: 3
+});
 
 window.customElements.define('veltec-multi-video', VeltecMultiVideo);

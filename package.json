@@ -6,10 +6,11 @@
   "dependencies": {
     "@polymer/font-roboto": "^3.0.2",
     "@polymer/iron-icons": "^3.0.1",
+    "@polymer/paper-item": "^3.0.1",
+    "@polymer/paper-listbox": "^3.0.1",
     "@polymer/paper-slider": "^3.0.1",
     "@polymer/polymer": "^3.0.0",
-    "@vaadin/vaadin-context-menu": "^4.2.0",
-    "@vaadin/vaadin-list-box": "^1.1.0"
+    "@vaadin/vaadin-context-menu": "^4.2.0"
   },
   "devDependencies": {
     "@polymer/iron-demo-helpers": "^3.0.0-pre.19",

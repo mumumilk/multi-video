@@ -1,8 +1,14 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 
 import '@vaadin/vaadin-context-menu/vaadin-context-menu.js';
-import '@vaadin/vaadin-list-box/vaadin-list-box.js';
-import '@vaadin/vaadin-item/vaadin-item.js';
+
+import '@polymer/paper-listbox/paper-listbox.js';
+import '@polymer/paper-item/paper-icon-item.js';
+import '@polymer/paper-item/paper-item.js';
+
+import '@polymer/iron-icon/iron-icon.js';
+import '@polymer/iron-icons/image-icons';
+
 
 export const VideoState = Object.freeze({
     PLAYING: 'playing',
@@ -159,14 +165,24 @@ class VeltecVideo extends PolymerElement {
                     align-items: center;
                     justify-content: center;
                     overflow: hidden;
+                    object-fit: fill
                 }
             </style>
             <vaadin-context-menu>
                 <template>
-                    <vaadin-list-box>
-                    <vaadin-item on-click="rotateRight">90° para a direita</vaadin-item>
-                    <vaadin-item on-click="rotateLeft">90° para a esquerda</vaadin-item>
-                    </vaadin-list-box>
+                    <paper-listbox>
+                        <paper-item disabled>
+                            Girar
+                        </paper-item>
+                        <paper-icon-item on-click="rotateRight">
+                            <iron-icon icon="image:rotate-right" slot="item-icon"></iron-icon>    
+                            90° para a direita
+                        </paper-icon-item>
+                        <paper-icon-item on-click="rotateLeft">
+                            <iron-icon icon="image:rotate-left" slot="item-icon"></iron-icon>    
+                            90° para a esquerda
+                        </paper-icon-item>
+                    </paper-listbox>
                 </template>
                 <video
                     on-timeupdate="onTimeUpdate"
