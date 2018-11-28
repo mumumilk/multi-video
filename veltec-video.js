@@ -96,11 +96,35 @@ class Video {
         }
 
         this.toggleOrientation();
+        this.setSizeAccordingToOrientation();
     }
 
     toggleOrientation() {
         this.orientation = this.orientation === VideoOrientation.LANDSCAPE ? VideoOrientation.PORTRAIT : VideoOrientation.LANDSCAPE;
     }
+
+    setSizeAccordingToOrientation() {
+        switch (this.orientation) {
+            case VideoOrientation.LANDSCAPE: {
+                this.element.style['height'] = '100%';
+                this.element.style['width'] = '100%';
+            } break;
+            case VideoOrientation.PORTRAIT: {
+                this.element.style['height'] = `${this.calculateProportionalWidth(this.element.parentElement)}px}`;
+                this.element.style['width'] = `${this.element.parentElement.offsetHeight}px`;
+            } break;
+        }
+    }
+
+    calculateProportionalWidth(element) {
+        // Valores de A e B foram escolhidos como a proporção do vídeo
+        const height = element.offsetHeight;
+    
+        const A = 5;
+        const B = 3.6;
+    
+        return (height * B) / A;
+      }
 }
 
 class VeltecVideo extends PolymerElement {

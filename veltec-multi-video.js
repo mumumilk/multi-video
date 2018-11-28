@@ -48,13 +48,8 @@ class VeltecMultiVideo extends PolymerElement {
     longestVideo.isMaster = true;
   
     if (this.template === GridTemplate.TEMPLATE3) {
-      debugger
       let elem = this.shadowRoot.querySelector(`#${this.videos[0].id}`);
-      elem.style['gridColumnStart'] = '1'
-      elem.style['gridColumnEnd'] = '3'
-      elem.style['gridRowEnd'] = '3'
-      elem.style['gridRowStart'] = '1'
-      elem.style['display'] = 'inline-flex'
+      elem.style['gridArea'] = '1 / 1 / 3 / 3'
     }
   }
 
@@ -126,7 +121,8 @@ class VeltecMultiVideo extends PolymerElement {
           background-color: #0e0e0e;
         }
         .full {
-          display: contents;
+          display: flex;
+          justify-content: center;
         }
       </style>
 
