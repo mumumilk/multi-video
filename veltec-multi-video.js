@@ -49,7 +49,13 @@ class VeltecMultiVideo extends PolymerElement {
   
     if (this.template === GridTemplate.TEMPLATE3) {
       let elem = this.shadowRoot.querySelector(`#${this.videos[0].id}`);
-      elem.style['gridArea'] = '1 / 1 / 3 / 3'
+      elem.style['gridArea'] = '1 / 1 / 3 / 3';
+      elem.style['display'] = 'inline-flex';
+    }
+
+    if (this.template === GridTemplate.TEMPLATE1) {
+      let elem = this.shadowRoot.querySelector(`#${this.videos[0].id}`);
+      elem.style['display'] = 'contents';
     }
   }
 
@@ -108,29 +114,27 @@ class VeltecMultiVideo extends PolymerElement {
         body {
           font-family: Roboto;
         }
-        .super-container {
-          height: 100%;
-          width: 100%;
-        }
         .videos-container {
-          height: 100%;
-          width: 100%;
           display: grid;
           grid-template-columns: 50% 50%;
           grid-template-rows: 50% 50%;
           background-color: #0e0e0e;
         }
         .full {
-          display: flex;
+          display: inline-flex;
           justify-content: center;
+        }
+        .fill {
+          height: 100%;
+          width: 100%;
         }
       </style>
 
-      <div class="super-container">
+      <div class="fill">
 
-        <div class="videos-container" id="template">
+        <div class="videos-container fill" id="template">
           <template is="dom-repeat" items="[[videos]]" >
-              <veltec-video class="full"
+              <veltec-video class="full fill"
                 url="[[item.url]]"
                 id="[[item.id]]">
               </veltec-video>
