@@ -37,7 +37,7 @@ class VeltecMultiVideo extends PolymerElement {
       return;
     }
 
-    videoElement.style['gridArea'] = `1 / 1 / ${this.template + 1} / ${this.template + 1}`;
+    videoElement.style['gridArea'] = `1 / 1 / ${this.template.id + 1} / ${this.template.id + 1}`;
   }
 
   onNewVideoAttached(ev) {
@@ -158,6 +158,7 @@ class VeltecMultiVideo extends PolymerElement {
       <style>
         :host {
           display: block;
+          height: 100% !important;
         }
         body {
           font-family: Roboto;
@@ -195,16 +196,17 @@ class VeltecMultiVideo extends PolymerElement {
       case VideosSize.REGULAR: {
         this.openFullscreen(this.$.super);
         this.size = VideosSize.FULLSCREEN;
+        this.videoArray.forEach(video => {
+          video.setSizeAccordingToOrientation();
+        });
         this.fullScreenIcon = 'icons:fullscreen-exit';
       } break;
       case VideosSize.FULLSCREEN: {
         this.closeFullscreen();
         this.size = VideosSize.REGULAR;
+        this.videoArray.forEach(video => video.setSizeAccordingToOrientation());
         this.fullScreenIcon = 'icons:fullscreen';
       }
-    
-      default:
-        break;
     }
   }
 
@@ -330,8 +332,8 @@ class VeltecMultiVideo extends PolymerElement {
   // e o tamanho se dará por (100 / número do template).
   // Ex: TEMPLATE2 = 2 --> repeat(2, 50%) -> grid-template-columns: 50% 50%
   setContainerTemplate() {
-    this.$.template.style['grid-template-columns'] = `repeat(${this.template}, ${(100/this.template).toFixed(2)}%)`;
-    this.$.template.style['grid-template-rows'] = `repeat(${this.template}, ${(100/this.template).toFixed(2)}%)`;
+    this.$.template.style['grid-template-columns'] = `repeat(${this.template.id}, ${(100/this.template.id).toFixed(2)}%)`;
+    this.$.template.style['grid-template-rows'] = `repeat(${this.template.id}, ${(100/this.template.id).toFixed(2)}%)`;
   }
 
   static get properties() {
@@ -386,17 +388,17 @@ const GridTemplate = Object.freeze({
   // |              |
   // |              |
   // |______________|
-  TEMPLATE1: 1,
+  TEMPLATE1: { id: 1, max: 1},
   //  ______________
   // |       |      |
   // |-------|------|
   // |_______|______|
-  TEMPLATE2: 2,
+  TEMPLATE2: { id: 2, max: 4},
   //  ______________
   // |         |____|
   // |_________|____|
   // |____|____|____|
-  TEMPLATE3: 3
+  TEMPLATE3: { id: 3, max: 6}
 });
 
 window.customElements.define('veltec-multi-video', VeltecMultiVideo);
