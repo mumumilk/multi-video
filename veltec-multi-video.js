@@ -198,17 +198,24 @@ class VeltecMultiVideo extends PolymerElement {
     switch (this.size) {
       case VideosSize.REGULAR: {
         this.openFullscreen(this.$.super);
-        this.size = VideosSize.FULLSCREEN;
-        this.videoArray.forEach(video => {
-          video.setSizeAccordingToOrientation();
-        });
-        this.fullScreenIcon = 'icons:fullscreen-exit';
+        // Esse setTimeout é necessário pra dar tempo do browser habilitar o fullscreen.
+        // É um workaround. O correto seria pegar o evento ou o retorno da solicitação
+        // do fullscreen.
+        setTimeout(() => {
+          this.videoArray.forEach(video => video.setSizeAccordingToOrientation());
+          this.size = VideosSize.FULLSCREEN;
+          this.fullScreenIcon = 'icons:fullscreen-exit';
+          this.shadowRoot.querySelector('.controls').style['background'] = 'rgba(0,0,0,0.5)';
+        }, 150);
       } break;
       case VideosSize.FULLSCREEN: {
         this.closeFullscreen();
-        this.size = VideosSize.REGULAR;
-        this.videoArray.forEach(video => video.setSizeAccordingToOrientation());
-        this.fullScreenIcon = 'icons:fullscreen';
+        setTimeout(() => {
+          this.size = VideosSize.REGULAR;
+          this.videoArray.forEach(video => video.setSizeAccordingToOrientation());
+          this.fullScreenIcon = 'icons:fullscreen';
+          this.shadowRoot.querySelector('.controls').style['background'] = 'black';
+        }, 150);
       }
     }
   }
@@ -319,6 +326,8 @@ class VeltecMultiVideo extends PolymerElement {
   }
 
   videosChanged(videos) {
+    if (!videos) { return }
+
     switch (videos.length) {
       case 1: this.template = GridTemplate.TEMPLATE1; break;
       case 2: case 3: case 4: this.template = GridTemplate.TEMPLATE2; break;

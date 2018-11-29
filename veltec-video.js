@@ -191,6 +191,10 @@ class VeltecVideo extends PolymerElement {
     static get template() {
         return html`
             <style>
+                :host {
+                    height: 100%;
+                    width: 100%;
+                }
                 .video {
                     height: 100%;
                     width: 100%;
