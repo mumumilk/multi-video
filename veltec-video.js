@@ -46,6 +46,10 @@ class Video {
         return this.element.duration;
     }
 
+    get error() {
+        return this.element.error;
+    }
+
     get currentTime() {
         return this.element.currentTime;
     }
@@ -149,16 +153,16 @@ class VeltecVideo extends PolymerElement {
 
     onTimeUpdate() {
         if (this.video.isMaster) {
-            this.dispatch('timeUpdate', {currentTime: this.video.currentTime});
+            this.dispatch('timeUpdate', { currentTime: this.video.currentTime });
         }
     }
 
     onVideoCanPlay(ev) {
-        this.dispatch('newVideo', {video: this.video});
+        this.dispatch('newVideo', { video: this.video });
     }
 
     onVideoClicked() {
-        this.dispatch('videoClicked', {currentSize: this.video.size});
+        this.dispatch('videoClicked', { currentSize: this.video.size });
         this.video.toggleSize();
     }
 
@@ -166,6 +170,10 @@ class VeltecVideo extends PolymerElement {
         if (this.video.isMaster) {
             this.dispatch('videoEnded', null);
         }
+    }
+
+    onVideoError(ev) {
+        this.dispatch('videoError', { video: this.video });
     }
 
     // Bubbles e composed fazem com que o evento suba a
@@ -229,6 +237,7 @@ class VeltecVideo extends PolymerElement {
                     on-canplay="onVideoCanPlay"
                     on-ended="onVideoEnded"
                     on-click="onVideoClicked"
+                    on-error="onVideoError"
                     class="video"
                     id="[]"
                     poster="http://i68.tinypic.com/20zae12.png"

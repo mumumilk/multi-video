@@ -19,6 +19,7 @@ class VeltecMultiVideo extends PolymerElement {
     super();
     console.log('veltec-multi-video 0.0.0.1')
     this.videoArray = [];
+    this.videosWithError = 0;
     this.state = VideoState.PAUSED;
     this.size = VideosSize.REGULAR;
 
@@ -27,10 +28,11 @@ class VeltecMultiVideo extends PolymerElement {
     this.addEventListener('videoEnded', this.onMasterEnd);
     this.addEventListener('change', this.setTimeForAllVideos);
     this.addEventListener('videoClicked', this.videoClicked);
+    this.addEventListener('videoError', this.onVideoError);
   }
 
   videoClicked(ev) {
-    const videoElement = ev.path[0];
+    const videoElement = ev.composedPath()[0];
 
     if (ev.detail.currentSize === VideoSize.AMPLIFIED) {
       videoElement.style['gridArea'] = '';
@@ -50,6 +52,10 @@ class VeltecMultiVideo extends PolymerElement {
     }
   }
 
+  onVideoError(ev) {
+    this.videosWithError++;
+  }
+
   onMasterEnd(ev) {
     this.setAsEnded();
   }
@@ -60,7 +66,7 @@ class VeltecMultiVideo extends PolymerElement {
   }
 
   get allVideosAreLoaded() {
-    return this.videoArray.length === this.videos.length;
+    return this.videoArray.length === (this.videos.length - this.videosWithError);
   }
 
   /*  O vídeo mestre é o que possuí maior duração. Ele orquestrará todos os demais
@@ -77,10 +83,10 @@ class VeltecMultiVideo extends PolymerElement {
   vídeo para que ele fique maior que os demais. Na grid, isso corresponde
   ao vídeo preencher da 1ª coluna até a 3ª (1/1/3/3); */
   setFirstVideoCSS() {
-    const firstVideo = this.shadowRoot.querySelector(`#${this.videos[0].id}`);
-
+    
     switch (this.template) {
       case GridTemplate.TEMPLATE3: {
+        const firstVideo = this.shadowRoot.querySelector(`#${this.videos[0].id}`);
         firstVideo.style['gridArea'] = '1 / 1 / 3 / 3';
       }
     }
