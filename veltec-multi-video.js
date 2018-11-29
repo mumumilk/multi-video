@@ -45,7 +45,7 @@ class VeltecMultiVideo extends PolymerElement {
   }
 
   onMasterEnd(ev) {
-    this.setAsPaused();
+    this.setAsEnded();
   }
 
   onMasterTimeUpdate(ev) {
@@ -109,6 +109,11 @@ class VeltecMultiVideo extends PolymerElement {
   setTimeForAllVideos() {
     const newTime = (this.$.paperSlider.value * this.masterDuration) / 100;
     this.videoArray.forEach(video => video.currentTime = newTime);
+  }
+
+  setAsEnded() {
+    this.state = VideoState.ENDED;
+    this.icon = 'av:play-arrow';
   }
 
   setAsPaused() {
