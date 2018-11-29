@@ -52,13 +52,8 @@ class Video {
 
     set currentTime(seconds) {
         if (seconds > this.duration) {
-            this.element.currentTime = this.duration;
-            this.pause();
+            this.setAsEnded();
             return;
-        }
-
-        if (this.ended) {
-            this.play();
         }
 
         this.element.currentTime = seconds;
@@ -115,6 +110,10 @@ class Video {
                 this.element.style['width'] = '100%';
             } break;
             case VideoOrientation.PORTRAIT: {
+                // O modo retrato possui peculiaridades pois quando
+                // o vídeo é girado, a sua altura se torna a largura, e vice-e-versa.
+                // Por conta disso, é necessário achar a proporção de acordo com o
+                // seu elemento pai.
                 this.element.style['height'] = `${this.calculateProportionalWidth(this.element.parentElement)}px}`;
                 this.element.style['width'] = `${this.element.parentElement.offsetHeight}px`;
             } break;
@@ -122,14 +121,20 @@ class Video {
     }
 
     calculateProportionalWidth(element) {
-        // Valores de A e B foram escolhidos como a proporção do vídeo
+        // O ratio foi escolhido na mão, por isso está hard-coded.
+        // Caso queira mudar a proporção do vídeo quando o mesmo é 
+        // rotacionado ou ampliado, deve alterar widthRatio e heightRatio
         const height = element.offsetHeight;
     
-        const A = 5;
-        const B = 3.6;
+        const widthRatio = 5;
+        const heightRatio = 3.6;
     
-        return (height * B) / A;
-      }
+        return (height * heightRatio) / widthRatio;
+    }
+
+    setAsEnded() {
+        this.element.currentTime = this.duration;
+    }
 }
 
 class VeltecVideo extends PolymerElement {
@@ -163,6 +168,8 @@ class VeltecVideo extends PolymerElement {
         }
     }
 
+    // Bubbles e composed fazem com que o evento suba a
+    // árvore e chegue aos hosts desse componente
     dispatch(name, obj) {
         const ev = new CustomEvent(name, {
             detail: obj,

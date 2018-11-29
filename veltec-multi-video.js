@@ -8,7 +8,6 @@ import '@polymer/paper-slider';
 import '@polymer/font-roboto';
 
 import { VideoState, VideoSize } from  './veltec-video.js';
-import './veltec-controls.js';
 
 class VeltecMultiVideo extends PolymerElement {
   constructor() {
@@ -57,6 +56,8 @@ class VeltecMultiVideo extends PolymerElement {
     return this.videoArray.length === this.videos.length;
   }
 
+  /*  O vídeo mestre é o que possuí maior duração. Ele orquestrará todos os demais
+  vídeos. O vídeo mestre define o estado atual do multi-video (duração, tempo atual, estado...)*/
   setMasterVideo() {
     const longestDuration = Math.max(...this.videoArray.map(video => video.duration));
     this.masterDuration = longestDuration;
@@ -65,6 +66,9 @@ class VeltecMultiVideo extends PolymerElement {
     longestVideo.isMaster = true;
   }
 
+  /* Ao mudar para o TEMPLATE3, é necessário alterar o CSS do primeiro
+  vídeo para que ele fique maior que os demais. Na grid, isso corresponde
+  ao vídeo preencher da 1ª coluna até a 3ª (1/1/3/3); */
   setFirstVideoCSS() {
     const firstVideo = this.shadowRoot.querySelector(`#${this.videos[0].id}`);
 
@@ -94,6 +98,10 @@ class VeltecMultiVideo extends PolymerElement {
     this.setAsPaused();
   }
 
+  /* Caso o estado mude para ENDED (quando o mestre acaba),
+  então pode dar play em todos.
+  Caso o vídeo ainda esteja em andamento, porém pausado,
+  dê play somente nos que não terminaram. */
   playAllVideos() {
     if (this.state === VideoState.ENDED) {
       this.videoArray.forEach(video => video.play());
@@ -106,9 +114,22 @@ class VeltecMultiVideo extends PolymerElement {
     this.setAsPlaying();
   }
 
+  /* Ao mudar o slider, o número que chega pra nós é a porcentagem do tempo
+  que foi escolhida. É necessário calcular quanto essa porcentagem corresponde
+  em segundos, alterar o tempo dos vídeos e continuar com o estado que estava (pausado / tocando)*/
   setTimeForAllVideos() {
     const newTime = (this.$.paperSlider.value * this.masterDuration) / 100;
     this.videoArray.forEach(video => video.currentTime = newTime);
+
+    switch (this.state) {
+      case VideoState.ENDED:
+      case VideoState.PAUSED: {
+        this.pauseAllVideos();
+      } break;
+      case VideoState.PLAYING: {
+        this.playAllVideos();
+      } break;
+    }
   }
 
   setAsEnded() {
@@ -217,6 +238,9 @@ class VeltecMultiVideo extends PolymerElement {
     `;
   }
 
+  /* Método que transforma segundos em MM:SS.
+  Não foram colocados horas pois atualmente não
+  trabalhamos com vídeos com mais de minutos de duração */
   toHHMMSS(secs) {
     var sec_num = parseInt(secs, 10);
     var hours   = Math.floor(sec_num / 3600);
@@ -241,6 +265,11 @@ class VeltecMultiVideo extends PolymerElement {
     this.setContainerTemplate();
   }
 
+  // Aqui é definido o cálculo para a grid que será montada de acordo com o template escolhido.
+  // O cálculo se dá através do número que representa o template (1, 2 e 3).
+  // Se repete então, a quantidade de linhas e colunas de acordo com o número do template, 
+  // e o tamanho se dará por (100 / número do template).
+  // Ex: TEMPLATE2 = 2 --> repeat(2, 50%) -> grid-template-columns: 50% 50%
   setContainerTemplate() {
     this.$.template.style['grid-template-columns'] = `repeat(${this.template}, ${(100/this.template).toFixed(2)}%)`;
     this.$.template.style['grid-template-rows'] = `repeat(${this.template}, ${(100/this.template).toFixed(2)}%)`;
