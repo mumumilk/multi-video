@@ -17,6 +17,7 @@ const VideosSize = Object.freeze({
 class VeltecMultiVideo extends PolymerElement {
   constructor() {
     super();
+    console.log('veltec-multi-video 0.0.0.1')
     this.videoArray = [];
     this.state = VideoState.PAUSED;
     this.size = VideosSize.REGULAR;
@@ -173,6 +174,8 @@ class VeltecMultiVideo extends PolymerElement {
         .fill {
           height: 100%;
           width: 100%;
+          max-height: 100%;
+          max-width: 100%;
         }
       </style>
 
