@@ -195,11 +195,13 @@ class VeltecVideo extends PolymerElement {
                     height: 100%;
                     width: 100%;
                     object-fit: fill;
+                    z-index: 99;
                 }
                 vaadin-context-menu {
                     height: 100%;
                     display: flex;
                     justify-content: center;
+                    z-index: 100;
                 }
             </style>
             <vaadin-context-menu override>

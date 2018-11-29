@@ -9,11 +9,17 @@ import '@polymer/font-roboto';
 
 import { VideoState, VideoSize } from  './veltec-video.js';
 
+const VideosSize = Object.freeze({
+  REGULAR: 0,
+  FULLSCREEN: 1
+});
+
 class VeltecMultiVideo extends PolymerElement {
   constructor() {
     super();
     this.videoArray = [];
     this.state = VideoState.PAUSED;
+    this.size = VideosSize.REGULAR;
 
     this.addEventListener('timeUpdate', this.onMasterTimeUpdate);
     this.addEventListener('newVideo', this.onNewVideoAttached);
@@ -169,7 +175,7 @@ class VeltecMultiVideo extends PolymerElement {
         }
       </style>
 
-      <div class="fill">
+      <div class="fill" id="super">
 
         <div class="videos-container fill" id="template">
           <template is="dom-repeat" items="[[videos]]" >
@@ -179,10 +185,51 @@ class VeltecMultiVideo extends PolymerElement {
               </veltec-video>
           </template>
         </div>
-
         ${this.controlsTemplate}
       </div>
     `;
+  }
+
+  toggleFullscreen() {
+    switch (this.size) {
+      case VideosSize.REGULAR: {
+        this.openFullscreen(this.$.super);
+        this.size = VideosSize.FULLSCREEN;
+        this.fullScreenIcon = 'icons:fullscreen-exit';
+      } break;
+      case VideosSize.FULLSCREEN: {
+        this.closeFullscreen();
+        this.size = VideosSize.REGULAR;
+        this.fullScreenIcon = 'icons:fullscreen';
+      }
+    
+      default:
+        break;
+    }
+  }
+
+  openFullscreen(elem) {
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.mozRequestFullScreen) {
+      elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+      elem.msRequestFullscreen();
+    }
+  }
+
+  closeFullscreen() {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
   }
 
   static get controlsTemplate() {
@@ -196,6 +243,8 @@ class VeltecMultiVideo extends PolymerElement {
           justify-content: space-around;
           align-items: center;
           padding: 5px;
+          position: sticky;
+          bottom: 0;
         }
         iron-icon {
           fill: var(--icon-toggle-color, rgb(255,255,255));
@@ -234,6 +283,16 @@ class VeltecMultiVideo extends PolymerElement {
           </paper-slider>
 
           <p>[[toHHMMSS(masterDuration)]]</p>
+
+          <button
+            id="play"
+            on-click="toggleFullscreen"
+            type="button"
+            style="border: none; background: transparent">
+            <iron-icon
+              icon="[[fullScreenIcon]]">
+            </iron-icon>
+          </button>
         </div>
     `;
   }
@@ -285,6 +344,12 @@ class VeltecMultiVideo extends PolymerElement {
       icon: {
         type: String,
         value: 'av:play-arrow',
+        notify: true,
+        reflectToAttribute: true
+      },
+      fullScreenIcon: {
+        type: String,
+        value: 'icons:fullscreen',
         notify: true,
         reflectToAttribute: true
       },
