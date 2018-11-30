@@ -170,6 +170,10 @@ class VeltecMultiVideo extends PolymerElement {
         body {
           font-family: Roboto;
         }
+        #super {
+          display: flex;
+          flex-direction: column;
+        }
         .videos-container {
           display: grid;
           grid-template-columns: 50% 50%;
