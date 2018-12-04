@@ -222,11 +222,13 @@ class VeltecMultiVideo extends PolymerElement {
       } break;
       case VideosSize.FULLSCREEN: {
         this.closeFullscreen();
+        // Aqui o intervalo é maior pois no safari o tempo para voltar do fullscreen
+        // é maior.
         setTimeout(() => {
-          this.size = VideosSize.REGULAR;
           this.videoArray.forEach(video => video.setSizeAccordingToOrientation());
+          this.size = VideosSize.REGULAR;
           this.fullScreenIcon = 'icons:fullscreen';
-        }, 150);
+        }, 700);
       }
     }
   }

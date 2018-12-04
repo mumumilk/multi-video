@@ -132,7 +132,7 @@ class Video {
     
         const widthRatio = 5;
         const heightRatio = 3.6;
-    
+        
         return (height * heightRatio) / widthRatio;
     }
 
