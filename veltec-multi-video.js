@@ -6,6 +6,7 @@ import '@polymer/iron-icons/av-icons';
 
 import '@polymer/paper-slider';
 import '@polymer/font-roboto';
+import '@polymer/paper-spinner/paper-spinner.js';
 
 import { VideoState, VideoSize } from  './veltec-video.js';
 
@@ -47,6 +48,7 @@ class VeltecMultiVideo extends PolymerElement {
     this.videoArray.push(ev.detail.video);
 
     if (this.allVideosAreLoaded) {
+      this.isLoading = false;
       this.setMasterVideo();
       this.setFirstVideoCSS();
     }
@@ -282,15 +284,20 @@ class VeltecMultiVideo extends PolymerElement {
       </style>
         <div class="controls">
 
-          <button
-            id="play"
-            on-click="playOrPause"
-            type="button"
-            style="border: none; background: transparent">
-            <iron-icon
-              icon="[[icon]]">
-            </iron-icon>
-          </button>
+          <template is="dom-if" if="[[!isLoading]]">
+            <button
+              id="play"
+              on-click="playOrPause"
+              type="button"
+              style="border: none; background: transparent">
+              <iron-icon
+                icon="[[icon]]">
+              </iron-icon>
+            </button>
+          </template>
+          <template is="dom-if" if="[[isLoading]]">
+            <paper-spinner active></paper-spinner>
+          </template>
 
           <p>[[toHHMMSS(masterCurrentTime)]]</p>
 
@@ -396,6 +403,12 @@ class VeltecMultiVideo extends PolymerElement {
       template: {
         type: Number,
         value: GridTemplate.TEMPLATE1,
+        notify: true,
+        reflectToAttribute: true
+      },
+      isLoading: {
+        type: Boolean,
+        value: true,
         notify: true,
         reflectToAttribute: true
       }
