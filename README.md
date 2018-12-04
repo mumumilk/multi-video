@@ -1,21 +1,41 @@
-# \<multi-video\>
+# \<veltec-multi-video\>
 
 Webcomponent para rodar vários vídeos em sincronia
 
-## Install the Polymer-CLI
+## Instalar o polymer-CLI
 
-First, make sure you have the [Polymer CLI](https://www.npmjs.com/package/polymer-cli) and npm (packaged with [Node.js](https://nodejs.org)) installed. Run `npm install` to install your element's dependencies, then run `polymer serve` to serve your element locally.
+```
+$ npm i -g polymer-cli
+```
 
-## Viewing Your Element
+## Visualizar o componente
 
 ```
 $ polymer serve
 ```
 
-## Running Tests
+## Gerar pacote de build
+
+*AngularJS* 
+
+Copiar pasta `veltec-multi-video` de dentro da build e colar no projeto angularJS.
 
 ```
-$ polymer test
+$ polymer build
 ```
 
-Your application is already set up to be tested via [web-component-tester](https://github.com/Polymer/web-component-tester). Run `polymer test` to run your application's test suite locally.
+*Angular*
+
+Na pasta do componente, rode
+
+```
+$ npm pack
+```
+
+No projeto Angular, rode 
+
+```
+$ npm i /path/to/veltec-multi-video.tgz
+```
+
+
