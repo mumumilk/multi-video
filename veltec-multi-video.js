@@ -218,7 +218,6 @@ class VeltecMultiVideo extends PolymerElement {
           this.videoArray.forEach(video => video.setSizeAccordingToOrientation());
           this.size = VideosSize.FULLSCREEN;
           this.fullScreenIcon = 'icons:fullscreen-exit';
-          this.shadowRoot.querySelector('.controls').style['background'] = 'rgba(0,0,0,0.5)';
         }, 150);
       } break;
       case VideosSize.FULLSCREEN: {
@@ -227,7 +226,6 @@ class VeltecMultiVideo extends PolymerElement {
           this.size = VideosSize.REGULAR;
           this.videoArray.forEach(video => video.setSizeAccordingToOrientation());
           this.fullScreenIcon = 'icons:fullscreen';
-          this.shadowRoot.querySelector('.controls').style['background'] = 'black';
         }, 150);
       }
     }

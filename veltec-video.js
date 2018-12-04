@@ -215,6 +215,7 @@ class VeltecVideo extends PolymerElement {
                     justify-content: center;
                     z-index: 100;
                     background: black;
+                    overflow: hidden;
                 }
             </style>
             <vaadin-context-menu override>
