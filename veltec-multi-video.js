@@ -260,12 +260,10 @@ class VeltecMultiVideo extends PolymerElement {
         .controls {
           background: black;
           display: flex;
-          z-index: 999;
           flex-direction: row;
           justify-content: space-around;
           align-items: center;
           padding: 5px;
-          position: sticky;
           bottom: 0;
         }
         iron-icon {
