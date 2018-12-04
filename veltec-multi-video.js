@@ -41,7 +41,9 @@ class VeltecMultiVideo extends PolymerElement {
       return;
     }
 
+    videoElement.style['zIndex'] = '99';
     videoElement.style['gridArea'] = `1 / 1 / ${this.template.id + 1} / ${this.template.id + 1}`;
+    
   }
 
   onNewVideoAttached(ev) {
@@ -85,10 +87,9 @@ class VeltecMultiVideo extends PolymerElement {
   vídeo para que ele fique maior que os demais. Na grid, isso corresponde
   ao vídeo preencher da 1ª coluna até a 3ª (1/1/3/3); */
   setFirstVideoCSS() {
-    
     switch (this.template) {
       case GridTemplate.TEMPLATE3: {
-        const firstVideo = this.shadowRoot.querySelector(`#${this.videos[0].id}`);
+        const firstVideo = this.shadowRoot.getElementById(`${this.videos[0].id}`);
         firstVideo.style['gridArea'] = '1 / 1 / 3 / 3';
       }
     }

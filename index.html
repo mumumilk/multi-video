@@ -11,20 +11,37 @@
   </head>
   <body>
     <section style="height: 477px; width: 705px;">
+        <div style="display: flex; justify-content: space-between; padding: 10px">
+          <button type="button" onclick="chooseCameras(1)">1 câmera</button>
+          <button type="button" onclick="chooseCameras(4)">4 câmeras</button>
+          <button type="button" onclick="chooseCameras(6)">6 câmeras</button>
+        </div>
       <veltec-multi-video id="mv" ></veltec-multi-video>
   </section>
 
   <script>
-    document.getElementById('mv').videos = [
-      {url: 'http://techslides.com/demos/sample-videos/small.mp4', id: 'video1'},
-      {url: 'http://techslides.com/demos/sample-videos/small.mp4', id: 'video2'},
-      {url: 'http://www.html5videoplayer.net/videos/toystory.mp4', id: 'video3'},
-      // {url: 'http://www.html5videoplayer.net/videos/toystory.mp4', id: 'video4'},
-      // {url: 'http://www.html5videoplayer.net/videos/toystory.mp4', id: 'video5'},
-      // {url: 'http://www.html5videoplayer.net/videos/toystory.mp4', id: 'video6'}
-      // {url: 'http://localhost:9000/requisicoes/19897/video/2', id: 'video6'},
-      // {url: 'http://localhost:9000/requisicoes/19897/video/0', id: 'video7'}
-    ];
+    chooseCameras(1);
+    function chooseCameras(total) {
+      videos2 = [];
+      for (let index = 0; index < total; index++) {
+        videos2.push({url: 'http://www.html5videoplayer.net/videos/toystory.mp4', id: `${index}`})
+        
+      }
+      document.getElementById('mv').videos = videos2;
+    }
+
+
+
+    // document.getElementById('mv').videos = [
+    //   {url: 'http://techslides.com/demos/sample-videos/small.mp4', id: 'video1'},
+    //   {url: 'http://techslides.com/demos/sample-videos/small.mp4', id: 'video2'},
+    //   {url: 'http://www.html5videoplayer.net/videos/toystory.mp4', id: 'video3'},
+    //   // {url: 'http://www.html5videoplayer.net/videos/toystory.mp4', id: 'video4'},
+    //   // {url: 'http://www.html5videoplayer.net/videos/toystory.mp4', id: 'video5'},
+    //   // {url: 'http://www.html5videoplayer.net/videos/toystory.mp4', id: 'video6'}
+    //   // {url: 'http://localhost:9000/requisicoes/19897/video/2', id: 'video6'},
+    //   // {url: 'http://localhost:9000/requisicoes/19897/video/0', id: 'video7'}
+    // ];
   </script>
   </body>
 </html>
